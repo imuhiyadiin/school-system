@@ -1,0 +1,279 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum RoleType {
+  ADMIN
+  TEACHER
+  STUDENT
+  PARENT
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+enum ExamStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+}
+
+enum PaymentStatus {
+  PENDING
+  PARTIAL
+  PAID
+  OVERDUE
+}
+
+model User {
+  id              Int             @id @default(autoincrement())
+  name            String
+  email           String          @unique
+  password        String
+  role            RoleType
+  isActive        Boolean         @default(true)
+  lastLoginAt     DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  student         Student?
+  teacher         Teacher?
+  parent          Parent?
+  refreshTokens   RefreshToken[]
+  resetTokens     PasswordResetToken[]
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  tokenHash String   @unique
+  userId    Int
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  tokenHash String   @unique
+  userId    Int
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Student {
+  id          Int                 @id @default(autoincrement())
+  userId      Int                 @unique
+  admissionNo String              @unique
+  dob         DateTime?
+  gender      String?
+  address     String?
+  phone       String?
+  parentId    Int?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent      Parent?             @relation(fields: [parentId], references: [id], onDelete: SetNull)
+  classes     ClassStudent[]
+  attendances Attendance[]
+  results     Result[]
+  payments    FeePayment[]
+}
+
+model Teacher {
+  id        Int              @id @default(autoincrement())
+  userId    Int              @unique
+  employeeNo String          @unique
+  dob       DateTime?
+  gender    String?
+  address   String?
+  phone     String?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classes   ClassTeacher[]
+  subjects  SubjectTeacher[]
+}
+
+model Parent {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @unique
+  phone     String?
+  address   String?
+  occupation String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  students  Student[]
+}
+
+model Class {
+  id          Int             @id @default(autoincrement())
+  name        String
+  grade       Int
+  section     String?
+  academicYear String
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  students    ClassStudent[]
+  teachers    ClassTeacher[]
+  subjects    Subject[]
+  exams       Exam[]
+  feeStructures FeeStructure[]
+
+  @@unique([name, section, academicYear])
+}
+
+model ClassStudent {
+  studentId Int
+  classId   Int
+  assignedAt DateTime @default(now())
+
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@id([studentId, classId])
+}
+
+model ClassTeacher {
+  teacherId Int
+  classId   Int
+  assignedAt DateTime @default(now())
+
+  teacher   Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  class     Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@id([teacherId, classId])
+}
+
+model Subject {
+  id          Int              @id @default(autoincrement())
+  name        String
+  code        String           @unique
+  description String?
+  classId     Int?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  class       Class?           @relation(fields: [classId], references: [id], onDelete: SetNull)
+  teachers    SubjectTeacher[]
+  examSubjects ExamSubject[]
+  results     Result[]
+}
+
+model SubjectTeacher {
+  subjectId Int
+  teacherId Int
+  assignedAt DateTime @default(now())
+
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  teacher   Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@id([subjectId, teacherId])
+}
+
+model Attendance {
+  id        Int              @id @default(autoincrement())
+  studentId Int
+  classId   Int?
+  date      DateTime
+  status    AttendanceStatus
+  remarks   String?
+  createdAt DateTime         @default(now())
+
+  student   Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, date])
+}
+
+model Exam {
+  id          Int           @id @default(autoincrement())
+  name        String
+  type        String
+  classId     Int
+  startDate   DateTime
+  endDate     DateTime
+  status      ExamStatus    @default(DRAFT)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  class       Class         @relation(fields: [classId], references: [id], onDelete: Cascade)
+  subjects    ExamSubject[]
+  results     Result[]
+}
+
+model ExamSubject {
+  examId    Int
+  subjectId Int
+  examDate  DateTime?
+  maxMarks  Int      @default(100)
+
+  exam      Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@id([examId, subjectId])
+}
+
+model Result {
+  id        Int      @id @default(autoincrement())
+  studentId Int
+  subjectId Int
+  examId    Int
+  marks     Float
+  grade     String?
+  gpa       Float?
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  exam      Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, subjectId, examId])
+}
+
+model FeeStructure {
+  id          Int          @id @default(autoincrement())
+  classId     Int
+  title       String
+  amount      Float
+  dueDate     DateTime
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  class       Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
+  payments    FeePayment[]
+}
+
+model FeePayment {
+  id             Int           @id @default(autoincrement())
+  studentId      Int
+  feeStructureId Int
+  amount         Float
+  method         String
+  reference      String?
+  status         PaymentStatus @default(PAID)
+  paidAt         DateTime      @default(now())
+  createdAt      DateTime      @default(now())
+
+  student        Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  feeStructure   FeeStructure  @relation(fields: [feeStructureId], references: [id], onDelete: Cascade)
+}

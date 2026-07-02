@@ -1,0 +1,129 @@
+import { z } from "zod";
+export declare const createStudentSchema: z.ZodObject<{
+    body: z.ZodObject<{
+        name: z.ZodString;
+        email: z.ZodEmail;
+        password: z.ZodOptional<z.ZodString>;
+        admissionNo: z.ZodString;
+        dob: z.ZodOptional<z.ZodCoercedDate<unknown>>;
+        gender: z.ZodOptional<z.ZodString>;
+        address: z.ZodOptional<z.ZodString>;
+        phone: z.ZodOptional<z.ZodString>;
+        parentId: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+export declare const updateStudentSchema: z.ZodObject<{
+    params: z.ZodObject<{
+        id: z.ZodCoercedNumber<unknown>;
+    }, z.core.$strip>;
+    body: z.ZodObject<{
+        name: z.ZodOptional<z.ZodString>;
+        email: z.ZodOptional<z.ZodEmail>;
+        password: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+        admissionNo: z.ZodOptional<z.ZodString>;
+        dob: z.ZodOptional<z.ZodOptional<z.ZodCoercedDate<unknown>>>;
+        gender: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+        address: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+        phone: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+        parentId: z.ZodOptional<z.ZodOptional<z.ZodNumber>>;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+export declare const createTeacherSchema: z.ZodObject<{
+    body: z.ZodObject<{
+        name: z.ZodString;
+        email: z.ZodEmail;
+        password: z.ZodOptional<z.ZodString>;
+        employeeNo: z.ZodString;
+        dob: z.ZodOptional<z.ZodCoercedDate<unknown>>;
+        gender: z.ZodOptional<z.ZodString>;
+        address: z.ZodOptional<z.ZodString>;
+        phone: z.ZodOptional<z.ZodString>;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+export declare const updateTeacherSchema: z.ZodObject<{
+    params: z.ZodObject<{
+        id: z.ZodCoercedNumber<unknown>;
+    }, z.core.$strip>;
+    body: z.ZodObject<{
+        name: z.ZodOptional<z.ZodString>;
+        email: z.ZodOptional<z.ZodEmail>;
+        password: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+        employeeNo: z.ZodOptional<z.ZodString>;
+        dob: z.ZodOptional<z.ZodOptional<z.ZodCoercedDate<unknown>>>;
+        gender: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+        address: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+        phone: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+export declare const createParentSchema: z.ZodObject<{
+    body: z.ZodObject<{
+        name: z.ZodString;
+        email: z.ZodEmail;
+        password: z.ZodOptional<z.ZodString>;
+        phone: z.ZodOptional<z.ZodString>;
+        address: z.ZodOptional<z.ZodString>;
+        occupation: z.ZodOptional<z.ZodString>;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+export declare const updateParentSchema: z.ZodObject<{
+    params: z.ZodObject<{
+        id: z.ZodCoercedNumber<unknown>;
+    }, z.core.$strip>;
+    body: z.ZodObject<{
+        name: z.ZodOptional<z.ZodString>;
+        email: z.ZodOptional<z.ZodEmail>;
+        password: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+        phone: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+        address: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+        occupation: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+export declare const createClassSchema: z.ZodObject<{
+    body: z.ZodObject<{
+        name: z.ZodString;
+        grade: z.ZodNumber;
+        section: z.ZodOptional<z.ZodString>;
+        academicYear: z.ZodString;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+export declare const updateClassSchema: z.ZodObject<{
+    params: z.ZodObject<{
+        id: z.ZodCoercedNumber<unknown>;
+    }, z.core.$strip>;
+    body: z.ZodObject<{
+        name: z.ZodOptional<z.ZodString>;
+        grade: z.ZodOptional<z.ZodNumber>;
+        section: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+        academicYear: z.ZodOptional<z.ZodString>;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+export declare const assignIdsSchema: z.ZodObject<{
+    params: z.ZodObject<{
+        id: z.ZodCoercedNumber<unknown>;
+    }, z.core.$strip>;
+    body: z.ZodObject<{
+        ids: z.ZodArray<z.ZodNumber>;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+export declare const createSubjectSchema: z.ZodObject<{
+    body: z.ZodObject<{
+        name: z.ZodString;
+        code: z.ZodString;
+        description: z.ZodOptional<z.ZodString>;
+        classId: z.ZodOptional<z.ZodNumber>;
+        teacherId: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+export declare const updateSubjectSchema: z.ZodObject<{
+    params: z.ZodObject<{
+        id: z.ZodCoercedNumber<unknown>;
+    }, z.core.$strip>;
+    body: z.ZodObject<{
+        name: z.ZodOptional<z.ZodString>;
+        code: z.ZodOptional<z.ZodString>;
+        description: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+        classId: z.ZodOptional<z.ZodOptional<z.ZodNumber>>;
+        teacherId: z.ZodOptional<z.ZodOptional<z.ZodNumber>>;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+//# sourceMappingURL=school.validation.d.ts.map
